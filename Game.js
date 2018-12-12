@@ -2,9 +2,22 @@ const inquirer = require("inquirer");
 
 class Game {
   constructor() {
+    this.playerOneToken = "X";
     this.playerOne;
+    this.playerTwoToken = "O";
     this.playerTwo;
+    this.currentPlayer = this.playerOneToken;
     this.board = ["T", "I", "C", "T", "A", "C", "T", "O", "E"];
+    this.winCombos = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
     this.gameStart();
   }
 
@@ -37,6 +50,26 @@ class Game {
         `-----|-----|------\n` +
         `  ${this.board[6]}  |  ${this.board[7]}  |  ${this.board[8]}  \n`
     );
+  }
+
+  checkForWinner(player) {
+    //loop over the possible winning combinations
+    for (let i = 0; i < this.winCombos.length; i++) {
+      const combo = this.winCombos[i];
+      //check if any combination has all tree spots for current player
+      let counter = 0;
+      for (let j = 0; j < combo.length; j++) {
+        if (combo[j] === this.currentPlayer) {
+          counter++;
+        }
+      }
+      //return true if this is valid
+      if (counter === 3) {
+        return true;
+      }
+    }
+    //otherwise return false
+    return false;
   }
 }
 
