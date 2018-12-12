@@ -7,7 +7,7 @@ class Game {
     this.playerTwoToken = "O";
     this.playerTwo;
     this.currentPlayer = this.playerOneToken;
-    this.board = ["T", "I", "C", "T", "A", "C", "T", "O", "E"];
+    this.board = ["0", "1", "2", "3", "4", "5", "6", "7", "8"];
     this.winCombos = [
       [0, 1, 2],
       [3, 4, 5],
@@ -32,6 +32,7 @@ class Game {
       } as Player Two`
     );
     this.printBoard();
+    this.makeMove();
   }
 
   getPlayer(player) {
@@ -50,6 +51,38 @@ class Game {
         `-----|-----|------\n` +
         `  ${this.board[6]}  |  ${this.board[7]}  |  ${this.board[8]}  \n`
     );
+  }
+
+  async makeMove() {
+    const { location } = await this.getLocation();
+    const validLocation = this.validateLocation(location);
+    if (validLocation) {
+      this.board[location] = this.currentPlayer;
+      this.changePlayer();
+      this.printBoard();
+      this.makeMove();
+    } else {
+      console.log("You selected a location that is already taken! Try again");
+      this.makeMove();
+    }
+  }
+
+  changePlayer() {
+    this.currentPlayer === "X"
+      ? (this.currentPlayer = "O")
+      : (this.currentPlayer = "X");
+  }
+
+  getLocation() {
+    return inquirer
+      .prompt([
+        { name: "location", message: `Where do you want to put your token?` }
+      ])
+      .then(answer => answer);
+  }
+
+  validateLocation(location) {
+    return this.board[location] === location;
   }
 
   checkForWinner(player) {
