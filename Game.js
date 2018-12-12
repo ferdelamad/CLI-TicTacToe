@@ -4,7 +4,7 @@ class Game {
   constructor() {
     this.playerOne;
     this.playerTwo;
-    this.board = [];
+    this.board = ["T", "I", "C", "T", "A", "C", "T", "O", "E"];
     this.gameStart();
   }
 
@@ -18,6 +18,7 @@ class Game {
         this.playerTwo
       } as Player Two`
     );
+    this.printBoard();
   }
 
   getPlayer(player) {
@@ -26,6 +27,16 @@ class Game {
         { name: "name", message: `What's the name of Player ${player}?` }
       ])
       .then(answer => answer);
+  }
+
+  printBoard() {
+    console.log(
+      `\n  ${this.board[0]}  |  ${this.board[1]}  |  ${this.board[2]}\n` +
+        `-----|-----|------\n` +
+        `  ${this.board[3]}  |  ${this.board[4]}  |  ${this.board[5]}\n` +
+        `-----|-----|------\n` +
+        `  ${this.board[6]}  |  ${this.board[7]}  |  ${this.board[8]}  \n`
+    );
   }
 }
 
