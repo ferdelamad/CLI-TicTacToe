@@ -6,7 +6,7 @@ class Game {
     this.playerOne;
     this.playerTwoToken = "O";
     this.playerTwo;
-    this.currentPlayer = this.playerOneToken;
+    this.currentPlayerToken = this.playerOneToken;
     this.board = ["0", "1", "2", "3", "4", "5", "6", "7", "8"];
     this.winCombos = [
       [0, 1, 2],
@@ -25,7 +25,7 @@ class Game {
 
   async gameStart() {
     const playerOne = await this.getPlayer("One");
-    this.playerOne = playerOne.name;
+    this.playerOne = this.currentPlayer = playerOne.name;
     const playerTwo = await this.getPlayer("Two");
     this.playerTwo = playerTwo.name;
     console.log(
@@ -58,36 +58,44 @@ class Game {
   async makeMove() {
     const { location } = await this.getLocation();
     const validLocation = this.validateLocation(location);
-    const currentPlayer = this.currentPlayer;
     if (validLocation === "valid") {
-      this.board[location] = this.currentPlayer;
-      this.changePlayer();
-      this.printBoard();
+      const currentPlayer = this.currentPlayerToken;
+      this.board[location] = this.currentPlayerToken;
       this.moves += 1;
+      if (this.handleWinner(currentPlayer)) {
+        return;
+      }
+      this.printBoard();
+      this.changePlayer();
     } else if (validLocation === "taken") {
       console.log("You selected a location that is already taken! Try again");
     } else if (validLocation === "invalid") {
       console.log("You typed an invalid input! Try numbers from 0-8");
     }
-    const isWinner = this.checkForWinner(currentPlayer);
-    this.handleWinner(isWinner);
+    this.makeMove();
   }
 
-  handleWinner(isWinner) {
+  handleWinner(currentPlayer) {
+    const isWinner = this.checkForWinner(currentPlayer);
     if (isWinner) {
-      console.log("YOU WON!");
-      return;
+      console.log(`Congratulations! ${this.currentPlayer} won!`);
+      this.printBoard();
+      return true;
     } else if (!isWinner && this.moves === 9) {
+      this.printBoard();
       console.log("We have a draw, try again!");
-    } else {
-      this.makeMove();
+      return true;
     }
+    return false;
   }
 
   getLocation() {
     return inquirer
       .prompt([
-        { name: "location", message: `Where do you want to put your token?` }
+        {
+          name: "location",
+          message: `Where do you want to put your token ${this.currentPlayer}?`
+        }
       ])
       .then(answer => answer);
   }
@@ -104,9 +112,12 @@ class Game {
   }
 
   changePlayer() {
-    this.currentPlayer === "X"
-      ? (this.currentPlayer = "O")
-      : (this.currentPlayer = "X");
+    this.currentPlayerToken === "X"
+      ? (this.currentPlayerToken = "O")
+      : (this.currentPlayerToken = "X");
+    this.currentPlayer === this.playerOne
+      ? (this.currentPlayer = this.playerTwo)
+      : (this.currentPlayer = this.playerOne);
   }
 
   checkForWinner(currentPlayer) {
