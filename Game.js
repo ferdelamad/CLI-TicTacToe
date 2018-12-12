@@ -19,6 +19,7 @@ class Game {
       [2, 4, 6]
     ];
     this.range = RegExp("^([0-8])$");
+    this.moves = 0;
     this.gameStart();
   }
 
@@ -57,16 +58,30 @@ class Game {
   async makeMove() {
     const { location } = await this.getLocation();
     const validLocation = this.validateLocation(location);
+    const currentPlayer = this.currentPlayer;
     if (validLocation === "valid") {
       this.board[location] = this.currentPlayer;
       this.changePlayer();
       this.printBoard();
+      this.moves += 1;
     } else if (validLocation === "taken") {
       console.log("You selected a location that is already taken! Try again");
     } else if (validLocation === "invalid") {
       console.log("You typed an invalid input! Try numbers from 0-8");
     }
-    this.makeMove();
+    const isWinner = this.checkForWinner(currentPlayer);
+    this.handleWinner(isWinner);
+  }
+
+  handleWinner(isWinner) {
+    if (isWinner) {
+      console.log("YOU WON!");
+      return;
+    } else if (!isWinner && this.moves === 9) {
+      console.log("We have a draw, try again!");
+    } else {
+      this.makeMove();
+    }
   }
 
   getLocation() {
@@ -94,14 +109,14 @@ class Game {
       : (this.currentPlayer = "X");
   }
 
-  checkForWinner() {
+  checkForWinner(currentPlayer) {
     //loop over the possible winning combinations
     for (let i = 0; i < this.winCombos.length; i++) {
       const combo = this.winCombos[i];
       //check if any combination has all tree spots for current player
       let counter = 0;
       for (let j = 0; j < combo.length; j++) {
-        if (combo[j] === this.currentPlayer) {
+        if (this.board[combo[j]] === currentPlayer) {
           counter++;
         }
       }
