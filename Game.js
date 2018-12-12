@@ -18,6 +18,7 @@ class Game {
       [0, 4, 8],
       [2, 4, 6]
     ];
+    this.range = RegExp("^([0-8])$");
     this.gameStart();
   }
 
@@ -56,21 +57,16 @@ class Game {
   async makeMove() {
     const { location } = await this.getLocation();
     const validLocation = this.validateLocation(location);
-    if (validLocation) {
+    if (validLocation === "valid") {
       this.board[location] = this.currentPlayer;
       this.changePlayer();
       this.printBoard();
-      this.makeMove();
-    } else {
+    } else if (validLocation === "taken") {
       console.log("You selected a location that is already taken! Try again");
-      this.makeMove();
+    } else if (validLocation === "invalid") {
+      console.log("You typed an invalid input! Try numbers from 0-8");
     }
-  }
-
-  changePlayer() {
-    this.currentPlayer === "X"
-      ? (this.currentPlayer = "O")
-      : (this.currentPlayer = "X");
+    this.makeMove();
   }
 
   getLocation() {
@@ -82,10 +78,23 @@ class Game {
   }
 
   validateLocation(location) {
-    return this.board[location] === location;
+    const isValid = this.range.test(location);
+    if (!isValid) {
+      return "invalid";
+    } else if (this.board[location] !== location) {
+      return "taken";
+    } else {
+      return "valid";
+    }
   }
 
-  checkForWinner(player) {
+  changePlayer() {
+    this.currentPlayer === "X"
+      ? (this.currentPlayer = "O")
+      : (this.currentPlayer = "X");
+  }
+
+  checkForWinner() {
     //loop over the possible winning combinations
     for (let i = 0; i < this.winCombos.length; i++) {
       const combo = this.winCombos[i];
