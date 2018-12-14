@@ -4,7 +4,8 @@
   "description": "CLI Tic Tac Toe Game",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "play": "node Game.js"
   },
   "repository": {
     "type": "git",
